@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTrendingSeries } from "../services/api";
+import { getTrendingSeries } from "../services/api.jsx";
 import {
   Grid,
   Card,

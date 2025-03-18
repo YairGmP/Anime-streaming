@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getEpisodesByTitle } from "../services/api";
+import { getEpisodesByTitle } from "../services/api.jsx";
 import {
   Typography,
   List,

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   getAnimeByPage,
   searchAnimeByKeyword,
-} from "../services/api";
+} from "../services/api.jsx";
 import {
   Grid,
   Card,
