@@ -1,0 +1,25 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/static-build"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "https://animeapi.skin/$1",
+        "headers": {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET",
+          "x-requested-with": "XMLHttpRequest"
+        }
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html",
+        "status": 200
+      }
+    ]
+  }
