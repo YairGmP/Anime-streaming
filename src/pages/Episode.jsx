@@ -31,7 +31,7 @@ const Episode = () => {
           onClick={() => navigate(-1)} // Regresa a la página anterior
           style={{ marginTop: '20px' }}
         >
-          Volver a la lista de episodios
+          Volver
         </Button>
       </Box>
     </div>

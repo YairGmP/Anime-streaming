@@ -16,15 +16,15 @@ import {
   Pagination,
   Stack,
 } from "@mui/material";
-import "../pages/Home.css"; // Asegúrate de importar el archivo CSS
+import "../pages/Home.css";
 
 const Series = () => {
-  const [animeList, setAnimeList] = useState([]); // Lista de animes agrupados
-  const [searchKeyword, setSearchKeyword] = useState(""); // Palabra clave de búsqueda
-  const [isLoading, setIsLoading] = useState(false); // Estado de carga
-  const [isSearching, setIsSearching] = useState(false); // Estado de búsqueda
-  const [currentPage, setCurrentPage] = useState(1); // Página actual
-  const [totalPages] = useState(200); // Total de páginas
+  const [animeList, setAnimeList] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(2); // Cambiado a 2 como página inicial
+  const [totalPages] = useState(200);
 
   // Agrupar animes por título y sumar episodios
   const groupAnimeByTitle = (animes) => {
@@ -56,6 +56,10 @@ const Series = () => {
         setAnimeList(groupedAnime);
       } catch (error) {
         console.error("Error fetching anime:", error);
+        // Si hay error, intenta con página 2
+        if (currentPage !== 2) {
+          setCurrentPage(2);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -70,7 +74,7 @@ const Series = () => {
   const handleSearch = async () => {
     if (!searchKeyword.trim()) {
       setIsSearching(false);
-      setCurrentPage(1);
+      setCurrentPage(2); // Cambiado a 2 como página por defecto
       return;
     }
 
@@ -89,15 +93,17 @@ const Series = () => {
 
   // Cambiar de página
   const handlePageChange = (event, page) => {
-    setCurrentPage(page);
+    // Si intentan ir a la página 1, redirigir a la 2
+    const targetPage = page === 1 ? 2 : page;
+    setCurrentPage(targetPage);
     setIsSearching(false);
   };
 
   return (
     <div style={{ padding: "20px" }}>
       <Typography variant="h4" color="white" gutterBottom style={{ marginTop: "30px" }}>
-              Buscar Anime
-            </Typography>
+        Buscar Anime
+      </Typography>
 
       {/* Buscador */}
       <Box sx={{ display: "flex", gap: 2, marginBottom: "20px" }}>
@@ -160,7 +166,7 @@ const Series = () => {
                 sx={{
                   flexGrow: 1,
                   padding: "8px",
-                  color: "#fff", // Texto blanco para contraste
+                  color: "#fff",
                 }}
               >
                 <Typography
@@ -196,7 +202,7 @@ const Series = () => {
                     minWidth: "100%",
                     background:
                       "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",
-                    color: "#000", // Texto negro para contraste
+                    color: "#000",
                     textTransform: "none",
                     boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
                   }}

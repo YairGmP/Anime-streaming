@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTrendingSeries } from "../services/api.jsx";
+import { getAnimeByPage } from "../services/api.jsx";
 import { Grid, Card, CardMedia, CardContent, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import "../pages/Home.css";
@@ -11,13 +11,13 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let isMounted = true; // Para evitar actualizaciones en componentes desmontados
+    let isMounted = true;
 
-    const fetchTrendingSeries = async () => {
+    const fetchAnimeSeries = async () => {
       try {
-        const data = await getTrendingSeries();
+        const data = await getAnimeByPage(2);
         
-        if (!isMounted) return; // Evitar "memory leaks"
+        if (!isMounted) return;
         
         if (!data || data.length === 0) {
           throw new Error('La API no devolvió resultados');
@@ -37,14 +37,26 @@ const Home = () => {
       }
     };
 
-    fetchTrendingSeries();
+    fetchAnimeSeries();
 
     return () => {
-      isMounted = false; // Cleanup al desmontar el componente
+      isMounted = false;
     };
   }, []);
 
-  // Pantalla de carga optimizada
+  const handleWatchEpisode = (serie) => {
+    const episodeUrl = `https://2anime.xyz/embed/${serie.title.toLowerCase().replace(/[^\w-]+/g, '-')}-episode-${serie.episode}`;
+    const encodedEpisodeUrl = encodeURIComponent(episodeUrl);
+    
+    // Redirige al componente Episode con los parámetros necesarios
+    navigate(`/episode/${encodedEpisodeUrl}`, {
+      state: {
+        title: serie.title,
+        episode: serie.episode
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div style={{ 
@@ -59,7 +71,6 @@ const Home = () => {
     );
   }
 
-  // Manejo de errores mejorado
   if (error) {
     return (
       <div style={{ 
@@ -85,7 +96,6 @@ const Home = () => {
     );
   }
 
-  // Renderizado principal (igual al tuyo original)
   return (
     <div style={{ padding: "20px", color: "#fff" }}>
       <Typography variant="h3" gutterBottom style={{ textAlign: "center" }}>
@@ -132,13 +142,7 @@ const Home = () => {
                   background: "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",
                   color: "#000"
                 }}
-                onClick={() => navigate(`/episode`, { 
-                  state: { 
-                    embedUrl: `https://2anime.xyz/embed/${serie.title.toLowerCase().replace(/[^\w-]+/g, '-')}-episode-${serie.episode}`,
-                    title: serie.title,
-                    episode: serie.episode
-                  }
-                })}
+                onClick={() => handleWatchEpisode(serie)}
               >
                 Ver Episodio
               </Button>
