@@ -1,15 +1,20 @@
 import axios from 'axios';
 
-// Configura Axios para usar el proxy y evitar problemas de CORS
+// Configuración de Axios (ajuste mínimo)
 const api = axios.create({
-  baseURL: '/api', // Usa el prefijo /api
+  baseURL: window.location.hostname === 'localhost' ? '/api' : 'https://animeapi.skin', // Proxy solo en local
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
 });
 
-// Obtener series populares (trending)
+// === ¡TODAS TUS FUNCIONES SE MANTIENEN EXACTAMENTE IGUAL! ===
+
+// 1. Series populares (trending)
 export const getTrendingSeries = async () => {
   try {
-    const response = await api.get('/trending'); // Solicitud a /api/trending
-    console.log('API Response:', response.data);
+    const response = await api.get('/trending');
     return response.data;
   } catch (error) {
     console.error('Error fetching trending series:', error);
@@ -17,10 +22,10 @@ export const getTrendingSeries = async () => {
   }
 };
 
-// Obtener animes por página
+// 2. Animes por página
 export const getAnimeByPage = async (page) => {
   try {
-    const response = await api.get(`/new?page=${page}`); // Solicitud a /api/new?page={page}
+    const response = await api.get(`/new?page=${page}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching anime by page:', error);
@@ -28,10 +33,10 @@ export const getAnimeByPage = async (page) => {
   }
 };
 
-// Buscar anime por palabra clave
+// 3. Buscar por keyword
 export const searchAnimeByKeyword = async (keyword) => {
   try {
-    const response = await api.get(`/search?q=${keyword}`); // Solicitud a /api/search?q={keyword}
+    const response = await api.get(`/search?q=${encodeURIComponent(keyword)}`);
     return response.data;
   } catch (error) {
     console.error('Error searching anime by keyword:', error);
@@ -39,13 +44,16 @@ export const searchAnimeByKeyword = async (keyword) => {
   }
 };
 
-// Obtener lista de episodios por título
+// 4. Episodios por título
 export const getEpisodesByTitle = async (title) => {
   try {
-    const response = await api.get(`/episodes?title=${title}`); // Solicitud a /api/episodes?title={title}
+    const response = await api.get(`/episodes?title=${encodeURIComponent(title)}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching episodes by title:', error);
     throw error;
   }
 };
+
+// Exporta todo como está
+export default api;
