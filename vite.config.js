@@ -10,7 +10,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         headers: {
-          'x-requested-with': 'XMLHttpRequest'  // Header requerido por la API
+          'x-requested-with': 'XMLHttpRequest'
         }
       }
     }

@@ -1,80 +1,76 @@
 import axios from 'axios';
 
-// Configuración del proxy público
-const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+// 1. Lista de proxies públicos como fallback
+const PROXY_SERVICES = [
+  'https://api.allorigins.win/get?url=',
+  'https://corsproxy.io/?',
+  'https://proxy.cors.sh/'
+];
+
+// 2. Tu API base
 const API_BASE_URL = 'https://animeapi.skin';
 
+// 3. Función para obtener un proxy aleatorio
+const getRandomProxy = () => {
+  return PROXY_SERVICES[Math.floor(Math.random() * PROXY_SERVICES.length)];
+};
+
+// 4. Configuración de Axios
 const api = axios.create({
-  baseURL: import.meta.env.DEV ? '/api' : `${PROXY_URL}${API_BASE_URL}`,
+  timeout: 10000, // 10 segundos de timeout
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'x-requested-with': 'XMLHttpRequest',
-    'X-Requested-With': 'XMLHttpRequest' // Algunos proxies necesitan este header adicional
+    'x-requested-with': 'XMLHttpRequest'
   }
 });
 
-// Opcional: Configuración para desarrollo local sin proxy
-if (import.meta.env.DEV) {
-  api.interceptors.request.use(config => {
-    console.log('Requesting:', config.url);
-    return config;
-  });
-}
+// 5. Interceptor para manejar diferentes entornos
+api.interceptors.request.use(async (config) => {
+  if (import.meta.env.DEV) {
+    // Desarrollo local con proxy de Vite
+    config.baseURL = '/api';
+  } else {
+    // Producción: Usar proxy con reintentos
+    const proxyUrl = getRandomProxy();
+    config.baseURL = `${proxyUrl}${encodeURIComponent(API_BASE_URL)}`;
+  }
+  
+  console.log('Request config:', config);
+  return config;
+});
 
-// ========== FUNCIONES ORIGINALES (MODIFICADAS PARA USAR PROXY) ==========
-export const getTrendingSeries = async () => {
+// 6. Interceptor para manejar errores
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.code === 'ECONNABORTED' || !error.response) {
+      console.warn('Proxy fallido, intentando con otro...');
+      const newProxy = getRandomProxy();
+      error.config.baseURL = `${newProxy}${encodeURIComponent(API_BASE_URL)}`;
+      return api.request(error.config);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ========== FUNCIONES DE API ==========
+const makeRequest = async (endpoint) => {
   try {
-    const response = await api.get('/trending');
-    return response.data;
+    const response = await api.get(endpoint);
+    // Para el proxy allorigins que devuelve la respuesta en .contents
+    return response.data.contents ? JSON.parse(response.data.contents) : response.data;
   } catch (error) {
-    console.error('Error fetching trending series:', {
+    console.error('API Error:', {
+      endpoint,
       error: error.message,
-      response: error.response?.data,
       config: error.config
     });
     throw error;
   }
 };
 
-export const getAnimeByPage = async (page) => {
-  try {
-    const response = await api.get(`/new?page=${page}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching anime by page:', {
-      error: error.message,
-      response: error.response?.data,
-      config: error.config
-    });
-    throw error;
-  }
-};
-
-export const searchAnimeByKeyword = async (keyword) => {
-  try {
-    const response = await api.get(`/search?q=${encodeURIComponent(keyword)}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error searching anime by keyword:', {
-      error: error.message,
-      response: error.response?.data,
-      config: error.config
-    });
-    throw error;
-  }
-};
-
-export const getEpisodesByTitle = async (title) => {
-  try {
-    const response = await api.get(`/episodes?title=${encodeURIComponent(title)}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching episodes by title:', {
-      error: error.message,
-      response: error.response?.data,
-      config: error.config
-    });
-    throw error;
-  }
-};
+export const getTrendingSeries = () => makeRequest('/trending');
+export const getAnimeByPage = (page) => makeRequest(`/new?page=${page}`);
+export const searchAnimeByKeyword = (keyword) => makeRequest(`/search?q=${encodeURIComponent(keyword)}`);
+export const getEpisodesByTitle = (title) => makeRequest(`/episodes?title=${encodeURIComponent(title)}`);
