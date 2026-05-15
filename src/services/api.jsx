@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.DEV ? '/api' : 'https://api.jikan.moe/v4',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
