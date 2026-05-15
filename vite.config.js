@@ -6,12 +6,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://animeapi.skin',
+        target: 'https://api.jikan.moe/v4',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
-        headers: {
-          'x-requested-with': 'XMLHttpRequest'
-        }
       }
     }
   }
