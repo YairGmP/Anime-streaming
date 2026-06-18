@@ -15,7 +15,7 @@ const WatchEpisode = () => {
     setEpisode(episodeId);
   }, [animeTitle, episodeId]);
 
-  const iframeUrl = `https://gogoplay.io/embed/${animeTitle.toLowerCase().replace(/[^\w-]/g, '-')}-episode-${episodeId}`;
+  const iframeUrl = `https://anicdn.stream/embed/${animeTitle.toLowerCase().replace(/[^\w-]/g, '-')}-episode-${episodeId}`;
 
   const handleIframeError = () => {
     setError('No se pudo cargar el episodio. Por favor, intenta nuevamente o verifica la URL.');
