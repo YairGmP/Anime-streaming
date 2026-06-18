@@ -44,6 +44,6 @@ export const getEpisodesByTitle = async (title) => {
     .replace(/[^\w-]+/g, '-');
 
   return Array.from({ length: episodeCount }, (_, i) => ({
-    embed_url: `https://2anime.xyz/embed/${slug}-episode-${i + 1}`,
+    embed_url: `https://gogoplay.io/embed/${slug}-episode-${i + 1}`,
   }));
 };

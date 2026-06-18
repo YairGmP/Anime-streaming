@@ -45,7 +45,7 @@ const Home = () => {
   }, []);
 
   const handleWatchEpisode = (serie) => {
-    const episodeUrl = `https://2anime.xyz/embed/${serie.title.toLowerCase().replace(/[^\w-]+/g, '-')}-episode-${serie.episode}`;
+    const episodeUrl = `https://gogoplay.io/embed/${serie.title.toLowerCase().replace(/[^\w-]+/g, '-')}-episode-${serie.episode}`;
     const encodedEpisodeUrl = encodeURIComponent(episodeUrl);
     
     // Redirige al componente Episode con los parámetros necesarios
